@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="https://www.thymeleaf.com" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <title>Dodaj pracownika</title>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand text-light" href="/">MagazynManagement</a>
+        <!--<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>-->
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active text-light" aria-current="page" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active text-light" aria-current="page" href="/placowki">Nasze placówki</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active text-light" aria-current="page" href="/produkty">Produkty</a>
+                </li>
+            </ul>
+            <div sec:authorize="hasAuthority('ADMIN')">
+                <a class="nav-link text-light" th:href="@{/admin}">Panel administratora</a>
+            </div>
+            <div sec:authorize="hasAuthority('USER')">
+                <a class="nav-link text-light" th:href="@{/user}">Panel klienta</a>
+            </div>
+            <div sec:authorize="hasAuthority('MANAGER')">
+                <a class="nav-link text-light" th:href="@{/manager}">Panel managera</a>
+            </div>
+            <div sec:authorize="hasAuthority('PRACOWNIK')">
+                <a class="nav-link text-light" th:href="@{/pracownik}">Panel pracownika</a>
+            </div>
+            <div sec:authorize="isAuthenticated()">
+                <a class="nav-link text-light" th:href="@{/logout}">Wyloguj się</a>
+            </div>
+            <div sec:authorize="isAnonymous()">
+                <a class="nav-link text-light" th:href="@{/login}">Zaloguj</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container my-5">
+    <h4 class="text-center">Dodaj pracownika</h4>
+
+    <!--    <div class="row mt-2">-->
+    <!--        <div th:if="$param.success">-->
+    <!--            Registration successfull.-->
+    <!--        </div>-->
+    <!--    </div>-->
+
+    <form class="col-md-4 offset-md-4" th:action="@{/admin/add-pracownik}"
+          method="post" role="form" th:object="${pracownikDto}">
+        <div class="mb-3">
+            <label for="imie" class="form-label">Imię</label>
+            <input th:field="*{imie}" type="text" class="form-control" id="imie" name="imie" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="nazwisko" class="form-label">Nazwisko</label>
+            <input th:field="*{nazwisko}" type="text" class="form-control" id="nazwisko" name="nazwisko" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="idMagazynu" class="form-label">Id Magazynu</label>
+            <input th:field="*{idMagazynu}" type="text" class="form-control" id="idMagazynu" name="idMagazynu" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="pensja" class="form-label">Pensja</label>
+            <input th:field="*{pensja}" type="text" class="form-control" id="pensja" name="pensja" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="stanowisko" class="form-label">Stanowisko</label>
+            <input th:field="*{stanowisko}" type="text" class="form-control" id="stanowisko" name="stanowisko" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="adres" class="form-label">Adres</label>
+            <input th:field="*{adres}" type="text" class="form-control" id="adres" name="adres"  required>
+        </div>
+
+        <div class="mb-3">
+            <label for="telefon" class="form-label">Numer telefonu</label>
+            <input th:field="*{telefon}" type="text" class="form-control" id="telefon" name="telefon"  required>
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">E-mail</label>
+            <input th:field="*{email}" type="email" class="form-control" id="email" name="email" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="login" class="form-label">Login</label>
+            <input th:field="*{login}" type="text" class="form-control" id="login" name="login" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="haslo" class="form-label">Hasło</label>
+            <input th:field="*{haslo}" type="password" class="form-control" id="haslo" name="haslo" required>
+        </div>
+
+        <button type="submit" class="btn btn-success">Dodaj pracownika</button>
+    </form>
+    <div class="row mt-2" th:if="${message != null}" style="color: red; text-align: center; width: 40%; margin: 0 auto;">
+        <p>[[${message}]]</p>
+    </div>
+</div>
+
+</body>
+</html>
