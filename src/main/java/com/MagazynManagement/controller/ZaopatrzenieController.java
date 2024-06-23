@@ -4,17 +4,21 @@ import com.MagazynManagement.dto.ZaopatrzenieDto;
 import com.MagazynManagement.entity.*;
 import com.MagazynManagement.repository.*;
 import com.MagazynManagement.service.ZaopatrzenieService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -32,19 +36,34 @@ public class ZaopatrzenieController {
 
     private final StanMagazynuRepository stanMagazynuRepository;
 
+    private final KontoRepository kontoRepository;
+
     @PostMapping("/manager/zaopatrzenieDodaj")
     public String zaopatrzenieDodaj(@ModelAttribute Zaopatrzenie zaopatrzenie){
+
         zaopatrzenieService.zaopatrzenieDodaj(zaopatrzenie);
         return "redirect:/manager/zaopatrzenie";
     }
 
     @GetMapping("/manager/zaopatrzenie")
-    public String zaopatrzenie(Model model){
-        List<Magazyn> listM = magazynRepository.findAll();
-        List<Material> listMa = materialRepozytory.findAll();
-        List<Pracownik> listP = pracownikRepository.findByStanowisko("Pracownik");
+    public String zaopatrzenie(Model model, Principal principal){
+        Konto kontoManagera = kontoRepository.findByLogin(principal.getName());
+        Pracownik manager = kontoManagera.getPracownik();
+        Long idMagazynu = manager.getIdMagazynu();
+
+        Magazyn magazyn = magazynRepository.findById(idMagazynu).orElse(null);
+        System.out.println(idMagazynu);
+        List<StanMagazynu> stanyMagazynowe = stanMagazynuRepository.findByMagazyn_IdMagazynu(magazyn.getIdMagazynu());
+        List<Material> listMa = stanyMagazynowe.stream()
+                .map(StanMagazynu::getMaterial)
+                .distinct()
+                .collect(Collectors.toList());
+//        List<Material> listMa = materialRepozytory.findAll();
+        List<Pracownik> listP = pracownikRepository.findByMagazynIdMagazynuAndStanowisko(idMagazynu ,"Pracownik");
+
         model.addAttribute("pracownicy", listP);
-        model.addAttribute("magazyn", listM);
+//        model.addAttribute("magazyn", magazyn);
+        model.addAttribute("idMagazynu", idMagazynu);
         model.addAttribute("produkty", listMa);
         return "zaopatrzenie";
     }

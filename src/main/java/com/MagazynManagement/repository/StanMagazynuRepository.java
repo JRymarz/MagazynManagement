@@ -21,6 +21,10 @@ public interface StanMagazynuRepository extends JpaRepository<StanMagazynu, Stan
 
     @Modifying
     @Transactional
-    @Query(value = "UPDATE stanmagazynu SET ilosc = ilosc - :ilosc WHERE id_produktu = :materialId", nativeQuery = true)
-    void odejmijMaterial(@Param("materialId") Long materialId, @Param("ilosc") int ilosc);
+    @Query(value = "UPDATE stanmagazynu SET ilosc = ilosc - :ilosc WHERE id_produktu = :materialId AND id_magazynu = :idMagazynu", nativeQuery = true)
+    void odejmijMaterial(@Param("materialId") Long materialId, @Param("ilosc") int ilosc, @Param("idMagazynu") Long idMagazynu);
+
+
+    @Query(value = "SELECT ilosc FROM stanmagazynu WHERE id_produktu = :materialId AND id_magazynu = :magazynId", nativeQuery = true)
+    Integer znajdzIloscWMagazynie(@Param("materialId") Long materialId, @Param("magazynId") Long magazynId);
 }

@@ -72,8 +72,10 @@
         </div>
 
         <div class="mb-3">
-            <label for="idMagazynu" class="form-label">Id Magazynu</label>
-            <input th:field="*{idMagazynu}" type="text" class="form-control" id="idMagazynu" name="idMagazynu" required>
+            <label for="idMagazynu" class="form-label">Wybierz magazyn</label>
+            <select th:field="*{idMagazynu}" class="form-select" id="idMagazynu" name="idMagazynu" required>
+                <option th:each="magazyn : ${listaMagazynow}" th:value="${magazyn.id}" th:text="${magazyn.idMagazynu + ' - ' + magazyn.adres}"></option>
+            </select>
         </div>
 
         <div class="mb-3">

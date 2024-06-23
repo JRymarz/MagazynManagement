@@ -53,9 +53,23 @@ public class RozpiskaService {
         dostawaRepository.save(dostawa);
     }
 
-    public List<SamochodDostawczy> getAllSamochodDostawczy(){return samochodDostawczyRepository.findAll();}
+    public List<SamochodDostawczy> getAllSamochodDostawczy(){
+        return samochodDostawczyRepository.findAll();
+    }
 
     public List<Rozpiska> getRozpiskaByPracownikId(Long id){
         return rozpiskaRepository.findByIdpracownika(id);
+    }
+
+    public List<Rozpiska> getRozpiskaByMagazyn(Long idMagazynu){
+        return rozpiskaRepository.findByIdMagazynuAndIdPracownikaIsNull(idMagazynu);
+    }
+
+    public List<Pracownik> getPracownikByMagazyn(Long idMagazynu) {
+        return pracownikRepository.findByMagazynIdMagazynuAndStanowisko(idMagazynu, "Pracownik");
+    }
+
+    public List<SamochodDostawczy> getSamochodByMagazyn(Long idMagazynu) {
+        return samochodDostawczyRepository.findByMagazynIdMagazynu(idMagazynu);
     }
 }

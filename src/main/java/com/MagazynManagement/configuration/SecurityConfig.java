@@ -51,7 +51,9 @@ public class SecurityConfig {
                         .successHandler(customSuccessHandler).permitAll())
                 .logout(form -> form.invalidateHttpSession(true).clearAuthentication(true)
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                        .logoutSuccessUrl("/login?logout").permitAll());
+                        .logoutSuccessUrl("/login?logout").permitAll())
+                .exceptionHandling()
+                    .accessDeniedPage("/403");
 
         return http.build();
     }

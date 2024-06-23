@@ -4,24 +4,30 @@ import com.MagazynManagement.dto.MaterialDto;
 import com.MagazynManagement.dto.PracownikDto;
 import com.MagazynManagement.dto.SektorDto;
 import com.MagazynManagement.entity.*;
+import com.MagazynManagement.repository.KontoRepository;
 import com.MagazynManagement.repository.MagazynRepository;
 import com.MagazynManagement.repository.SektorRepository;
 import com.MagazynManagement.repository.StanMagazynuRepository;
 import com.MagazynManagement.service.KontoService;
 import com.MagazynManagement.service.PracownikService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+@Validated
 @Controller
 @RequiredArgsConstructor
 public class PracownikController {
@@ -38,13 +44,21 @@ public class PracownikController {
 
     private final StanMagazynuRepository stanMagazynuRepository;
 
+    private final KontoRepository kontoRepository;
+
     @GetMapping("/manager/pracownicy")
-    public ModelAndView getPracownicyByManager(Model model){
-        List<Pracownik> list = pracownikService.getAllPracownik();
+    public ModelAndView getPracownicyByManager(Model model, Principal principal){
+        String username = principal.getName();
+
+        List<Pracownik> allList = pracownikService.getAllPracownik();
+        Konto zalogowaneKonto = kontoRepository.findByLogin(username);
+
+        List<Pracownik> list = allList.stream()
+                                .filter(pracownik -> !pracownik.equals(zalogowaneKonto.getPracownik()))
+                                .collect(Collectors.toList());
+
         model.addAttribute("pracownicy", list);
         return new ModelAndView("pracownicy", "pracownik", list);
-        //model.addAttribute("pracownik", pracownikService.getAllPracownik());
-       // return "pracownicy";
     }
 
     @PostMapping("/manager/usun-pracownika")
@@ -65,7 +79,45 @@ public class PracownikController {
     }
 
     @PostMapping("/manager/edytuj-pracownika")
-    public String edytujPracownikaByManager(@ModelAttribute Pracownik pracownik){
+    public String edytujPracownikaByManager(@Valid @ModelAttribute("pracownik") Pracownik pracownik, BindingResult bindingResult, Model model){
+        if (bindingResult.hasErrors()) {
+            List<Magazyn> dostepneMagazyny = magazynRepository.findAll();
+            model.addAttribute("dostepneMagazyny", dostepneMagazyny);
+            return "edytuj-pracownikaByManager";
+        }
+
+        try {
+            if (pracownik.getPensja() < 0) {
+                bindingResult.rejectValue("pensja", "pensja", "Pensja musi być nieujemną liczbą.");
+
+                List<Magazyn> listaMagazynow = magazynRepository.findAll();
+                model.addAttribute("dostepneMagazyny", listaMagazynow);
+                return "edytuj-pracownikaByManager";
+            }
+        } catch (NumberFormatException e) {
+            bindingResult.rejectValue("pensja", "pensja", "Pensja musi być liczbą.");
+
+            List<Magazyn> listaMagazynow = magazynRepository.findAll();
+            model.addAttribute("dostepneMagazyny", listaMagazynow);
+            return "edytuj-pracownikaByManager";
+        }
+
+        if (!kontoService.isValidAddressFormat(pracownik.getAdres())) {
+            bindingResult.rejectValue("adres", "adres", "Nieprawidłowy format adresu. Poprawny format: nazwa ulicy numer");
+
+            List<Magazyn> listaMagazynow = magazynRepository.findAll();
+            model.addAttribute("dostepneMagazyny", listaMagazynow);
+            return "edytuj-pracownikaByManager";
+        }
+
+        if (!StringUtils.hasLength(pracownik.getTelefon()) || pracownik.getTelefon().length() != 9 || !pracownik.getTelefon().matches("\\d{9}")) {
+            bindingResult.rejectValue("telefon", "telefon", "Numer telefonu musi składać się z 9 cyfr.");
+
+            List<Magazyn> listaMagazynow = magazynRepository.findAll();
+            model.addAttribute("dostepneMagazyny", listaMagazynow);
+            return "edytuj-pracownikaByManager";
+        }
+
         pracownikService.aktualizujPracownika(pracownik);
         return "redirect:/manager/pracownicy";
     }
@@ -91,11 +143,11 @@ public class PracownikController {
         return "pracownik-main";
     }
 
-    @GetMapping("/admin/add-pracownik")
-    public String addPracownikPage(Model model){
-        model.addAttribute("pracownikDto", new PracownikDto());
-        return "add-pracownik";
-    }
+//    @GetMapping("/admin/add-pracownik")
+//    public String addPracownikPage(Model model){
+//        model.addAttribute("pracownikDto", new PracownikDto());
+//        return "add-pracownik";
+//    }
 
     @GetMapping("/pracownik/wyszukaj-sektor")
     public String wyszukajSektor(Model model){
@@ -152,25 +204,79 @@ public class PracownikController {
         return "redirect:/manager/zmien-sektor/"+idMagazynu;
     }
 
-    @PostMapping("/admin/add-pracownik")
-    public String savePracownik(@ModelAttribute("pracownikDto") PracownikDto pracownikDto, Model model){
-        Pracownik savedPracownik = pracownikService.save(pracownikDto);
-        kontoService.save(pracownikDto, savedPracownik);
-        model.addAttribute("message", "Pracownik dodany");
-        return "add-pracownik";
-    }
-
     @GetMapping("manager/add-pracownik")
     public String addPracownikManagerPage(Model model){
+        List<Magazyn> listaMagazynow = magazynRepository.findAll();
         model.addAttribute("pracownikDto", new PracownikDto());
+        model.addAttribute("listaMagazynow", listaMagazynow);
         return "add-pracownikByManager";
     }
 
     @PostMapping("/manager/add-pracownik")
-    public String addPracownik(@ModelAttribute("pracownikDto") PracownikDto pracownikDto, Model model){
-        Pracownik savedPracownik = pracownikService.save(pracownikDto);
-        kontoService.save(pracownikDto, savedPracownik);
-        model.addAttribute("message", "Pracownik dodany");
-        return "add-pracownikByManager";
+    public String addPracownik(@Valid @ModelAttribute("pracownikDto") PracownikDto pracownikDto, Model model, BindingResult bindingResult){
+        if(!kontoService.isLoginUnique(pracownikDto.getLogin())){
+            bindingResult.rejectValue("login", "login", "Konto z tym loginem już istnieje");
+
+            List<Magazyn> listaMagazynow = magazynRepository.findAll();
+            model.addAttribute("listaMagazynow", listaMagazynow);
+            return "add-pracownikByManager";
+        }
+
+        if (!StringUtils.hasLength(pracownikDto.getTelefon()) || pracownikDto.getTelefon().length() != 9 || !pracownikDto.getTelefon().matches("\\d{9}")) {
+            bindingResult.rejectValue("telefon", "telefon", "Numer telefonu musi składać się z 9 cyfr.");
+
+            List<Magazyn> listaMagazynow = magazynRepository.findAll();
+            model.addAttribute("listaMagazynow", listaMagazynow);
+            return "add-pracownikByManager";
+        }
+
+        if (!kontoService.isValidAddressFormat(pracownikDto.getAdres())) {
+            bindingResult.rejectValue("adres", "adres", "Nieprawidłowy format adresu. Poprawny format: nazwa ulicy numer");
+
+            List<Magazyn> listaMagazynow = magazynRepository.findAll();
+            model.addAttribute("listaMagazynow", listaMagazynow);
+            return "add-pracownikByManager";
+        }
+
+        if (!pracownikDto.getImie().matches("[A-ZŁŚĆŻ][a-ząćęłńóśźż]*")) {
+            bindingResult.rejectValue("imie", "imie", "Nieprawidłowy format imienia.");
+
+            List<Magazyn> listaMagazynow = magazynRepository.findAll();
+            model.addAttribute("listaMagazynow", listaMagazynow);
+            return "add-pracownikByManager";
+        }
+
+        if (!pracownikDto.getNazwisko().matches("^[A-ZŁŚĆŻ][a-ząćęłńóśźż]*(-[A-ZŁŚĆŻ][a-ząćęłńóśźż]*)?$")) {
+            bindingResult.rejectValue("nazwisko", "nazwisko", "Nieprawidłowy format nazwiska.");
+
+            List<Magazyn> listaMagazynow = magazynRepository.findAll();
+            model.addAttribute("listaMagazynow", listaMagazynow);
+            return "add-pracownikByManager";
+        }
+
+        try {
+            if (pracownikDto.getPensja() < 0) {
+                bindingResult.rejectValue("pensja", "pensja", "Pensja musi być nieujemną liczbą.");
+
+                List<Magazyn> listaMagazynow = magazynRepository.findAll();
+                model.addAttribute("listaMagazynow", listaMagazynow);
+                return "add-pracownikByManager";
+            }
+        } catch (NumberFormatException e) {
+            bindingResult.rejectValue("pensja", "pensja", "Pensja musi być liczbą.");
+
+            List<Magazyn> listaMagazynow = magazynRepository.findAll();
+            model.addAttribute("listaMagazynow", listaMagazynow);
+            return "add-pracownikByManager";
+        }
+
+        if (bindingResult.hasErrors()) {
+            return "add-pracownikByManager";
+        } else {
+            Pracownik savedPracownik = pracownikService.save(pracownikDto);
+            kontoService.save(pracownikDto, savedPracownik);
+            model.addAttribute("message", "Pracownik dodany");
+            return "add-pracownikByManager";
+        }
     }
 }

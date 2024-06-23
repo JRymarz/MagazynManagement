@@ -67,7 +67,10 @@
 
         <div class="mb-3">
             <label for="cena" class="form-label">Cena</label>
-            <input th:field="*{cena}" type="text" class="form-control" id="cena" name="cena" required>
+            <input th:field="*{cena}" type="number" class="form-control" id="cena" name="cena" required>
+            <div th:if="${#fields.hasErrors('cena')}" class="text-danger">
+                <p th:each="error: ${#fields.errors('cena')}" th:text="${error}">Błąd</p>
+            </div>
         </div>
 
         <div class="mb-3">

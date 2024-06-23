@@ -13,4 +13,6 @@ public interface PracownikRepository extends JpaRepository<Pracownik, Long> {
 
     Optional<Pracownik> findByEmail(String email);
     List<Pracownik> findByStanowisko(String stanowisko);
+
+    List<Pracownik> findByMagazynIdMagazynuAndStanowisko(Long idMagazynu, String pracownik);
 }

@@ -16,4 +16,8 @@ import java.util.Optional;
 
 @Repository
 public interface SamochodDostawczyRepository extends JpaRepository<SamochodDostawczy, Long>{
+
+
+
+    List<SamochodDostawczy> findByMagazynIdMagazynu(Long idMagazynu);
 }

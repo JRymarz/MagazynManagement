@@ -72,9 +72,6 @@
                     Zobacz stan magazynu
                 </a>
             </td>
-            <td sec:authorize="hasAuthority('MANAGER')">
-                <a th:href="@{/manager/zmien-sektor/{id}(id=${m.idMagazynu})}" style="color: black; text-align: center" class="nav-link ">Zmien rozkład produktów</a>
-            </td>
         </tr>
         </tbody>
     </table>

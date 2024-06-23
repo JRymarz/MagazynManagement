@@ -64,16 +64,23 @@
             <th scope="col">Typ</th>
             <th scope="col">Ilość</th>
             <th scope="col">Wartość</th>
+            <th scope="col">Akcje</th>
         </tr>
         </thead>
         <tbody>
-        <tr th:each="pozycja : ${koszyk}">
+        <tr th:each="pozycja, index : ${koszyk}">
             <td th:text="${pozycja.material.nazwa}"></td>
             <td th:text="${pozycja.material.producent}"></td>
             <td th:text="${pozycja.material.cena}"></td>
             <td th:text="${pozycja.material.typ}"></td>
             <td th:text="${pozycja.ilosc}"></td>
             <td th:text="${pozycja.material.cena * pozycja.ilosc}"></td>
+            <td>
+                <form th:action="@{/user/usun-z-koszyka}" method="post">
+                    <input type="hidden" name="pozycjaIndex" th:value="${index.index}" />
+                    <button type="submit" class="btn btn-danger">Usuń pozycję</button>
+                </form>
+            </td>
         </tbody>
     </table>
 

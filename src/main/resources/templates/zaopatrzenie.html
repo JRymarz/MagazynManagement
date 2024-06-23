@@ -54,7 +54,7 @@
     <table class="table table-stiped table-hover" style="text-align: center;">
         <thead>
         <tr>
-            <th scope="col">Id Magazynu</th>
+            <th scope="col" style="display: none">Id Magazynu</th>
             <th scope="col">Produkt</th>
             <th scope="col">Ilosc</th>
             <th scope="col">Id Pracownika</th>
@@ -64,10 +64,8 @@
         <tbody>
             <tr>
                 <form class="col-md-4 offset-md-4" action="/manager/zaopatrzenieDodaj" method="post">
-                    <td>
-                    <select required name="id_magazynu">
-                        <option th:each="m :${magazyn}" th:value="${m.idMagazynu}" th:text="${m.idMagazynu}"></option>
-                    </select>
+                    <td style="display: none">
+                        <input type="number" name="id_magazynu" th:value="${idMagazynu}">
                     </td>
                     <td>
                     <select required name="id_produktu">
@@ -75,11 +73,11 @@
                     </select>
                     </td>
                     <td>
-                        <input type="number" required name="ilosc">
+                        <input type="number" required name="ilosc" min="1" step="1">
                     </td>
                     <td>
                     <select required name="idpracownika">
-                        <option th:each="p :${pracownicy}" th:value="${p.idPracownika}" th:text="${p.idPracownika}"></option>
+                        <option th:each="p :${pracownicy}" th:value="${p.idPracownika}" th:text="${p.idPracownika} + '. ' + ${p.imie} + ' ' + ${p.nazwisko}"></option>
                     </select>
                     </td>
                     <td>

@@ -64,21 +64,33 @@
         <div class="mb-3">
             <label for="imie" class="form-label">Imię</label>
             <input th:field="*{imie}" type="text" class="form-control" id="imie" name="imie" required>
+            <div th:if="${#fields.hasErrors('imie')}" class="text-danger">
+                <p th:each="error: ${#fields.errors('imie')}" th:text="${error}">Błąd</p>
+            </div>
         </div>
 
         <div class="mb-3">
             <label for="nazwisko" class="form-label">Nazwisko</label>
             <input th:field="*{nazwisko}" type="text" class="form-control" id="nazwisko" name="nazwisko" required>
+            <div th:if="${#fields.hasErrors('nazwisko')}" class="text-danger">
+                <p th:each="error: ${#fields.errors('nazwisko')}" th:text="${error}">Błąd</p>
+            </div>
         </div>
 
         <div class="mb-3">
             <label for="adres" class="form-label">Adres</label>
             <input th:field="*{adres}" type="text" class="form-control" id="adres" name="adres"  required>
+            <div th:if="${#fields.hasErrors('adres')}" class="text-danger">
+                <p th:each="error: ${#fields.errors('adres')}" th:text="${error}">Błąd</p>
+            </div>
         </div>
 
         <div class="mb-3">
             <label for="telefon" class="form-label">Numer telefonu</label>
             <input th:field="*{telefon}" type="text" class="form-control" id="telefon" name="telefon"  required>
+            <div th:if="${#fields.hasErrors('telefon')}" class="text-danger">
+                <p th:each="error : ${#fields.errors('telefon')}" th:text="${error}">Błędny numer telefonu</p>
+            </div>
         </div>
 
         <div class="mb-3">
@@ -89,6 +101,9 @@
         <div class="mb-3">
             <label for="login" class="form-label">Login</label>
             <input th:field="*{login}" type="text" class="form-control" id="login" name="login" required>
+            <div th:if="${#fields.hasErrors('login')}" class="text-danger">
+                <p th:each="error: ${#fields.errors('login')}" th:text="${error}">Błąd</p>
+            </div>
         </div>
 
         <div class="mb-3">

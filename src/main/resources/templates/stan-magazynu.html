@@ -55,6 +55,9 @@
 
 <div class="container my-5">
     <h4 class="text-center">Stan magazynu <span th:text="${adresMagazynu}"></span></h4>
+    <div th:if="${session.errorMessage}" class="alert alert-danger" role="alert">
+        <p th:text="${session.errorMessage}"></p>
+    </div>
     <table class="table table-stiped table-hover">
         <thead>
         <tr>
@@ -64,7 +67,7 @@
             <th scope="col">Typ</th>
             <th scope="col">Ilość</th>
             <th scope="col">Sektor</th>
-            <th scope="col">Akcje</th>
+            <th scope="col" sec:authorize="hasAuthority('USER') or isAnonymous()">Akcje</th>
         </tr>
         </thead>
         <tbody>
@@ -75,9 +78,10 @@
             <td th:text="${s.material.typ}"></td>
             <td th:text="${s.ilosc}"></td>
             <td th:text="${s.sektor.nazwa}"></td>
-            <td>
+            <td sec:authorize="hasAuthority('USER') or isAnonymous()">
                 <form th:action="@{/user/dodaj-do-koszyka}" method="post">
                     <input type="hidden" name="idMaterialu" th:value="${s.material.idProduktu}" />
+                    <input type="hidden" name="idMagazynu" th:value="${s.magazyn.idMagazynu}">
                     <input type="number" name="ilosc" value="1" min="1" th:max="${s.ilosc}" required />
                     <button type="submit">Dodaj do koszyka</button>
                 </form>

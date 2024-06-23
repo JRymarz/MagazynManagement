@@ -22,14 +22,17 @@ public class Rozpiska {
 
         private Long id_samochodu;
 
+        private Long idMagazynu;
+
         private int wykonane;
 
-        public Rozpiska(String adres, Date data, Long id_pracownika, Long nr_zamowienia, Long idSamochodu, int wykonane){
+        public Rozpiska(String adres, Date data, Long id_pracownika, Long nr_zamowienia, Long idSamochodu, Long idMagazynu,int wykonane){
             this.data = data;
             this.idpracownika = id_pracownika;
             this.nr_zamowienia = nr_zamowienia;
             this.adres = adres;
             this.id_samochodu = idSamochodu;
+            this.idMagazynu = idMagazynu;
             this.wykonane = wykonane;
         }
 
@@ -91,5 +94,13 @@ public class Rozpiska {
 
     public void setWykonane(int wykonane) {
         this.wykonane = wykonane;
+    }
+
+    public Long getIdMagazynu() {
+        return idMagazynu;
+    }
+
+    public void setIdMagazynu(Long idMagazynu) {
+        this.idMagazynu = idMagazynu;
     }
 }

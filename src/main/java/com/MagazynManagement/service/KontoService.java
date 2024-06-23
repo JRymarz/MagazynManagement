@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -54,5 +56,17 @@ public class KontoService {
                 savedPracownik,
                 pracownikDto.utworzRole());
         return kontoRepository.save(konto);
+    }
+
+    public boolean isLoginUnique(String login){
+        return kontoRepository.findByLogin(login) == null;
+    }
+
+
+    public boolean isValidAddressFormat(String address){
+        String pattern = "\\w+\\s\\d+";
+        Pattern compiledPattern = Pattern.compile(pattern);
+        Matcher matcher = compiledPattern.matcher(address);
+        return matcher.matches();
     }
 }

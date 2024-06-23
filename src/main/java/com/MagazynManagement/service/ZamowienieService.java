@@ -28,7 +28,7 @@ public class ZamowienieService {
 
     private final StanMagazynuRepository stanMagazynuRepository;
 
-    public void zlozNoweZamowienie(float kwota, List<PozycjaKoszyka> koszyk, AdresDostawy adresDostawy){
+    public void zlozNoweZamowienie(float kwota, List<PozycjaKoszyka> koszyk, AdresDostawy adresDostawy, Long idMagazynu){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         Klient klient = userDetails.getKonto().getKlient();
@@ -55,6 +55,7 @@ public class ZamowienieService {
         rozpiska.setWykonane(0);
         rozpiska.setData(calendar.getTime());
         rozpiska.setNr_zamowienia(zamowienie.getNrZamowienia());
+        rozpiska.setIdMagazynu(idMagazynu);
         rozpiskaRepozytory.save(rozpiska);
 
         for (PozycjaKoszyka pozycjaKoszyka : koszyk){
@@ -86,12 +87,12 @@ public class ZamowienieService {
         return zamowienieRepository.findAll();
     }
 
-    public void odejmijMaterialyZeStanuMagazynowego(List<PozycjaKoszyka> koszyk){
+    public void odejmijMaterialyZeStanuMagazynowego(List<PozycjaKoszyka> koszyk, Long idMagazynu){
         for(PozycjaKoszyka pozycja : koszyk){
             Material material = pozycja.getMaterial();
             int iloscDoOdjecia = pozycja.getIlosc();
 
-            stanMagazynuRepository.odejmijMaterial(material.getIdProduktu(), iloscDoOdjecia);
+            stanMagazynuRepository.odejmijMaterial(material.getIdProduktu(), iloscDoOdjecia, idMagazynu);
         }
     }
 }

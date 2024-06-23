@@ -17,4 +17,6 @@ public interface SektorRepository extends JpaRepository<Sektor, Long> {
     public List<Sektor> findByNazwa(String nazwa);
 
     public List<Sektor> findBymagazyn(Magazyn magazyn);
+
+    public List<Sektor> findByMagazynIdMagazynu(Long idMagazynu);
 }

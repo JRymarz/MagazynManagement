@@ -17,4 +17,6 @@ import java.util.Optional;
 public interface RozpiskaRepozytory extends JpaRepository<Rozpiska, Long>{
     List<Rozpiska> findByIdpracownika(Long idpracownika);
 
+    @Query("SELECT r FROM Rozpiska r WHERE r.idMagazynu = :idMagazynu AND r.idpracownika IS NULL")
+    List<Rozpiska> findByIdMagazynuAndIdPracownikaIsNull(@Param("idMagazynu") Long idMagazynu);
 }
